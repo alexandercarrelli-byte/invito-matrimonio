@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Audio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        button {
+            background: #5b8db8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2c5f8d;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Audio Player</h1>
+    
+    <div class="test-section">
+        <h2>Verifica File Audio</h2>
+        <p>Questo test ti aiuta a verificare se il file audio è presente e funzionante.</p>
+        
+        <audio id="testAudio" controls preload="auto">
+            <source src="harp-music.mp3" type="audio/mpeg">
+            <source src="harp-music.ogg" type="audio/ogg">
+            Il tuo browser non supporta l'elemento audio.
+        </audio>
+        
+        <div id="status"></div>
+        
+        <div style="margin-top: 20px;">
+            <button onclick="checkAudio()">Verifica Stato Audio</button>
+            <button onclick="testPlay()">Test Riproduzione</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Informazioni</h2>
+        <div id="info"></div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('testAudio');
+        const statusDiv = document.getElementById('status');
+        const infoDiv = document.getElementById('info');
+
+        function checkAudio() {
+            const info = {
+                'File caricato': audio.readyState >= 2 ? 'Sì' : 'No',
+                'Stato': audio.paused ? 'In pausa' : 'In riproduzione',
+                'Errore': audio.error ? getErrorText(audio.error.code) : 'Nessuno',
+                'Formato supportato': audio.canPlayType('audio/mpeg') ? 'MP3: Sì' : 'MP3: No',
+                'Percorso file': audio.currentSrc || audio.src || 'Nessuno'
+            };
+
+            let html = '<h3>Stato Audio:</h3><ul>';
+            for (let key in info) {
+                html += `<li><strong>${key}:</strong> ${info[key]}</li>`;
+            }
+            html += '</ul>';
+
+            infoDiv.innerHTML = html;
+
+            // Controlla errori
+            if (audio.error) {
+                statusDiv.innerHTML = `<div class="error">
+                    <strong>❌ Errore rilevato:</strong><br>
+                    ${getErrorText(audio.error.code)}<br><br>
+                    <strong>Soluzione:</strong><br>
+                    Assicurati che il file "harp-music.mp3" sia nella stessa cartella di questo file HTML.
+                </div>`;
+            } else if (audio.readyState >= 2) {
+                statusDiv.innerHTML = `<div class="success">
+                    <strong>✅ File audio caricato correttamente!</strong><br>
+                    Il file è presente e può essere riprodotto.
+                </div>`;
+            } else {
+                statusDiv.innerHTML = `<div class="error">
+                    <strong>⚠️ File audio non trovato o non ancora caricato</strong><br>
+                    Verifica che il file "harp-music.mp3" esista nella cartella del progetto.
+                </div>`;
+            }
+        }
+
+        function testPlay() {
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        statusDiv.innerHTML = `<div class="success">
+                            <strong>✅ Riproduzione avviata con successo!</strong>
+                        </div>`;
+                    })
+                    .catch(error => {
+                        statusDiv.innerHTML = `<div class="error">
+                            <strong>❌ Errore nella riproduzione:</strong><br>
+                            ${error.message}<br><br>
+                            Questo potrebbe essere normale se il browser blocca l'autoplay.
+                            Prova a cliccare manualmente sul pulsante play sopra.
+                        </div>`;
+                    });
+            }
+        }
+
+        function getErrorText(errorCode) {
+            const errors = {
+                1: 'MEDIA_ERR_ABORTED - Caricamento interrotto',
+                2: 'MEDIA_ERR_NETWORK - Errore di rete',
+                3: 'MEDIA_ERR_DECODE - Errore di decodifica',
+                4: 'MEDIA_ERR_SRC_NOT_SUPPORTED - Formato non supportato o file non trovato'
+            };
+            return errors[errorCode] || 'Errore sconosciuto';
+        }
+
+        // Controlla automaticamente al caricamento
+        audio.addEventListener('loadeddata', () => {
+            checkAudio();
+        });
+
+        audio.addEventListener('error', () => {
+            checkAudio();
+        });
+
+        // Controlla dopo 2 secondi
+        setTimeout(checkAudio, 2000);
+    </script>
+</body>
+</html>

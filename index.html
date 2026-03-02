@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Invito al matrimonio di Benigno Anna e Massimo Ferrari - 26 Agosto 2026">
+    <title>Anna & Massimo - Il Nostro Matrimonio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Hero Section con animazione iniziale -->
+    <section class="hero" id="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="names-container">
+                <h1 class="name name-1">Anna</h1>
+                <div class="ampersand">&</div>
+                <h1 class="name name-2">Massimo</h1>
+            </div>
+            <div class="date-container">
+                <p class="date-text">26 Agosto 2026</p>
+            </div>
+            <div class="scroll-indicator">
+                <div class="scroll-arrow"></div>
+            </div>
+        </div>
+        <div class="floating-hearts">
+            <span class="heart">💕</span>
+            <span class="heart">💕</span>
+            <span class="heart">💕</span>
+            <span class="heart">💕</span>
+            <span class="heart">💕</span>
+        </div>
+    </section>
+
+    <!-- Sezione Invito -->
+    <section class="invitation-section" id="invitation">
+        <div class="container">
+            <div class="invitation-card">
+                <div class="card-content">
+                    <h2 class="section-title">Siete Invitati</h2>
+                    <div class="divider"></div>
+                    <p class="invitation-text">
+                        Con grande gioia e affetto, desideriamo condividere con voi<br>
+                        il giorno più importante della nostra vita.
+                    </p>
+                    <p class="couple-names">Benigno Anna & Massimo Ferrari</p>
+                    <p class="invitation-text">
+                        Vi aspettiamo per celebrare insieme<br>
+                        il nostro matrimonio
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sezione Dettagli Evento -->
+    <section class="details-section" id="details">
+        <div class="container">
+            <h2 class="section-title">Dettagli dell'Evento</h2>
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="detail-icon">📅</div>
+                    <h3>Data</h3>
+                    <p>26 Agosto 2026</p>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-icon">⏰</div>
+                    <h3>Orario</h3>
+                    <p>Da confermare</p>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-icon">📍</div>
+                    <h3>Luogo</h3>
+                    <p>Da confermare</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sezione Form Conferma Presenza -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <h2 class="section-title">Conferma la Tua Presenza</h2>
+            <p class="contact-text">
+                Saremmo felici di sapere se potrete essere presenti<br>
+                per condividere con noi questo giorno speciale.
+            </p>
+            
+            <form id="rsvpForm" class="rsvp-form">
+                <!-- Presenza Sì/No -->
+                <div class="form-group">
+                    <label class="form-label">Sarete presenti?</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="presence" value="yes" required>
+                            <span class="radio-custom">Sì, saremo presenti</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="presence" value="no" required>
+                            <span class="radio-custom">No, purtroppo non possiamo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Numero di presenti (solo se presenti = sì) -->
+                <div class="form-group" id="numberGroup" style="display: none;">
+                    <label for="numberOfGuests" class="form-label">Quante persone?</label>
+                    <select id="numberOfGuests" name="numberOfGuests" class="form-input">
+                        <option value="">Seleziona il numero</option>
+                        <option value="1">1 persona</option>
+                        <option value="2">2 persone</option>
+                        <option value="3">3 persone</option>
+                        <option value="4">4 persone</option>
+                        <option value="5">5 persone</option>
+                        <option value="6">6 persone</option>
+                    </select>
+                </div>
+
+                <!-- Campi dinamici per nomi e allergie -->
+                <div id="guestsContainer" class="guests-container"></div>
+
+                <!-- Email di contatto -->
+                <div class="form-group">
+                    <label for="contactEmail" class="form-label">La tua email (per conferma)</label>
+                    <input type="email" id="contactEmail" name="contactEmail" class="form-input" required>
+                </div>
+
+                <!-- Messaggio opzionale -->
+                <div class="form-group">
+                    <label for="message" class="form-label">Messaggio (opzionale)</label>
+                    <textarea id="message" name="message" class="form-textarea" rows="4" placeholder="Scrivi un messaggio per gli sposi..."></textarea>
+                </div>
+
+                <!-- Bottone submit -->
+                <button type="submit" class="submit-btn">
+                    <span>Invia Conferma</span>
+                </button>
+            </form>
+
+            <!-- Messaggio di successo -->
+            <div id="successMessage" class="success-message" style="display: none;">
+                <div class="success-icon">✓</div>
+                <h3>Grazie per la tua conferma!</h3>
+                <p>La tua risposta è stata registrata con successo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Link per visualizzare i risultati (nascosto, accessibile tramite URL) -->
+    <div style="text-align: center; padding: 20px; background: #ffffff;">
+        <a href="admin.html" class="admin-link" style="color: #2c5f8d; text-decoration: none; font-size: 0.9rem; opacity: 0.7;">
+            Visualizza Conferme (Admin)
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">Con amore, Anna & Massimo</p>
+            <p class="footer-date">26 Agosto 2026</p>
+        </div>
+    </footer>
+
+    <!-- Audio Player -->
+    <div class="audio-player" id="audioPlayer">
+        <audio id="backgroundMusic" loop autoplay preload="auto">
+            <source src="harp-music.mp3" type="audio/mpeg">
+            <source src="harp-music.ogg" type="audio/ogg">
+            Il tuo browser non supporta l'elemento audio.
+        </audio>
+        <div class="audio-controls">
+            <button class="audio-btn" id="playPauseBtn" aria-label="Play/Pause">
+                <span class="audio-icon" id="playIcon">▶</span>
+                <span class="audio-icon" id="pauseIcon" style="display: none;">⏸</span>
+            </button>
+            <div class="audio-info">
+                <span class="audio-label">Musica di sottofondo</span>
+            </div>
+            <div class="volume-control">
+                <button class="volume-btn" id="muteBtn" aria-label="Mute/Unmute">
+                    <span class="volume-icon" id="volumeIcon">🔊</span>
+                    <span class="volume-icon" id="muteIcon" style="display: none;">🔇</span>
+                </button>
+                <input type="range" id="volumeSlider" min="0" max="100" value="50" class="volume-slider" aria-label="Volume">
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
