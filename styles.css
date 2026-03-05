@@ -238,10 +238,10 @@ body {
 
 .invitation-text {
     font-size: clamp(1rem, 2.5vw, 1.3rem);
-    color: #444;
+    color: #4a4a4a;
+    font-weight: 700;
     line-height: 1.8;
     margin: 20px 0;
-    font-weight: 300;
 }
 
 .couple-names {
@@ -281,15 +281,22 @@ body {
 }
 
 .detail-icon {
+    display: block;
+    width: 100%;
+    text-align: center;
     font-size: 3rem;
+    min-height: 4.5rem;
     margin-bottom: 20px;
     animation: pulse 2s ease-in-out infinite;
 }
 
 .detail-icon-calendar {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    min-height: 4.5rem;
+    margin-bottom: 20px;
     font-size: 0;
 }
 
@@ -305,6 +312,7 @@ body {
     color: var(--text-dark);
     margin-bottom: 15px;
     font-weight: 600;
+    text-align: center;
 }
 
 .detail-card p {
