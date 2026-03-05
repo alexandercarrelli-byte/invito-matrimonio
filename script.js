@@ -1,3 +1,6 @@
+// Endpoint Google Apps Script per salvataggio RSVP
+const RSVP_API_URL = 'https://script.google.com/macros/s/AKfycbwOvRfUz7Y6rbGJWM-BRjwa8TAdzVr2WxPB6SsROirpv-lsUcTjs4LdZTz6jzdU-2rPuA/exec';
+
 // Animazioni al scroll
 const observerOptions = {
     threshold: 0.1,
@@ -144,9 +147,9 @@ function saveRSVP() {
     const rsvpData = {
         id: Date.now(),
         timestamp: new Date().toISOString(),
-        presence: presence,
-        contactEmail: contactEmail,
-        message: message,
+        presence,
+        contactEmail,
+        message,
         guests: []
     };
 
@@ -168,25 +171,40 @@ function saveRSVP() {
         }
     }
 
-    // Salva in localStorage
-    let rsvps = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
-    rsvps.push(rsvpData);
-    localStorage.setItem('weddingRSVPs', JSON.stringify(rsvps));
+    // Invia i dati al backend Google Apps Script
+    fetch(RSVP_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(rsvpData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Errore durante l\'invio della conferma');
+        }
+        return response.json().catch(() => ({}));
+    })
+    .then(() => {
+        // Mostra messaggio di successo
+        form.style.display = 'none';
+        document.getElementById('successMessage').style.display = 'block';
 
-    // Mostra messaggio di successo
-    form.style.display = 'none';
-    document.getElementById('successMessage').style.display = 'block';
-    
-    // Scroll al messaggio
-    document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Scroll al messaggio
+        document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Reset form dopo 5 secondi (opzionale)
-    setTimeout(() => {
-        form.reset();
-        form.style.display = 'block';
-        document.getElementById('successMessage').style.display = 'none';
-        document.getElementById('numberGroup').style.display = 'none';
-        document.getElementById('guestsContainer').innerHTML = '';
-    }, 5000);
+        // Reset form dopo 5 secondi (opzionale)
+        setTimeout(() => {
+            form.reset();
+            form.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('numberGroup').style.display = 'none';
+            document.getElementById('guestsContainer').innerHTML = '';
+        }, 5000);
+    })
+    .catch((error) => {
+        console.error(error);
+        alert('Si è verificato un problema nel salvataggio della conferma. Per favore riprova tra qualche secondo.');
+    });
 }
 

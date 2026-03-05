@@ -1,30 +1,98 @@
+// Endpoint Google Apps Script (stesso usato nel form)
+const RSVP_API_URL = 'https://script.google.com/macros/s/AKfycbwOvRfUz7Y6rbGJWM-BRjwa8TAdzVr2WxPB6SsROirpv-lsUcTjs4LdZTz6jzdU-2rPuA/exec';
+
+// Cache dati grezzi per export
+let rawRowsForExport = [];
+
 // Carica e visualizza tutte le conferme
 document.addEventListener('DOMContentLoaded', () => {
     loadRSVPs();
 });
 
 function loadRSVPs() {
-    const rsvps = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
     const container = document.getElementById('rsvpsContainer');
-    
-    // Calcola statistiche
-    updateStats(rsvps);
-    
-    if (rsvps.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📋</div>
-                <h2>Nessuna conferma ancora</h2>
-                <p>Le conferme appariranno qui quando gli invitati compileranno il form.</p>
-            </div>
-        `;
-        return;
-    }
 
-    // Ordina per data (più recenti prima)
-    rsvps.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-state-icon">⏳</div>
+            <h2>Caricamento in corso...</h2>
+            <p>Recupero le conferme dal foglio Google.</p>
+        </div>
+    `;
 
-    container.innerHTML = rsvps.map(rsvp => createRSVPItem(rsvp)).join('');
+    fetch(RSVP_API_URL)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore nel caricamento dei dati');
+            }
+            return response.json();
+        })
+        .then(rows => {
+            // rows è una lista piatta di righe (una per ospite)
+            rawRowsForExport = rows || [];
+
+            if (!rawRowsForExport.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h2>Nessuna conferma ancora</h2>
+                        <p>Le conferme appariranno qui quando gli invitati compileranno il form.</p>
+                    </div>
+                `;
+                updateStats([]);
+                return;
+            }
+
+            const rsvps = groupRowsByRSVP(rawRowsForExport);
+
+            // Calcola statistiche
+            updateStats(rsvps);
+
+            // Ordina per data (più recenti prima)
+            rsvps.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            container.innerHTML = rsvps.map(rsvp => createRSVPItem(rsvp)).join('');
+        })
+        .catch(error => {
+            console.error(error);
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <h2>Errore nel caricamento</h2>
+                    <p>Non riesco a leggere le conferme dal foglio Google. Riprova tra qualche istante.</p>
+                </div>
+            `;
+        });
+}
+
+// Raggruppa le righe piatte in oggetti RSVP con lista ospiti
+function groupRowsByRSVP(rows) {
+    const map = new Map();
+
+    rows.forEach(row => {
+        const key = `${row.timestamp}|${row.contactEmail}`;
+        if (!map.has(key)) {
+            map.set(key, {
+                timestamp: row.timestamp,
+                presence: row.presence,
+                contactEmail: row.contactEmail,
+                message: row.message,
+                guests: []
+            });
+        }
+
+        const current = map.get(key);
+
+        if (row.guest_nome || row.guest_cognome || row.guest_allergie) {
+            current.guests.push({
+                nome: row.guest_nome || '',
+                cognome: row.guest_cognome || '',
+                allergie: row.guest_allergie || 'Nessuna'
+            });
+        }
+    });
+
+    return Array.from(map.values());
 }
 
 function createRSVPItem(rsvp) {
@@ -97,39 +165,23 @@ function updateStats(rsvps) {
 }
 
 function exportToCSV() {
-    const rsvps = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
-    
-    if (rsvps.length === 0) {
+    if (!rawRowsForExport.length) {
         alert('Nessun dato da esportare');
         return;
     }
 
     // Crea header CSV
-    let csv = 'Data,Email,Presenza,Numero Ospiti,Nome,Cognome,Allergie,Messaggio\n';
+    let csv = 'Data,Email,Presenza,Nome,Cognome,Allergie,Messaggio\n';
 
-    // Aggiungi dati
-    rsvps.forEach(rsvp => {
-        const date = new Date(rsvp.timestamp).toLocaleString('it-IT');
-        const presence = rsvp.presence === 'yes' ? 'Sì' : 'No';
-        const numGuests = rsvp.guests ? rsvp.guests.length : 0;
-        const message = (rsvp.message || '').replace(/"/g, '""');
+    rawRowsForExport.forEach(row => {
+        const date = new Date(row.timestamp).toLocaleString('it-IT');
+        const presence = row.presence === 'yes' ? 'Sì' : 'No';
+        const nome = (row.guest_nome || '').replace(/"/g, '""');
+        const cognome = (row.guest_cognome || '').replace(/"/g, '""');
+        const allergie = (row.guest_allergie || 'Nessuna').replace(/"/g, '""');
+        const message = (row.message || '').replace(/"/g, '""');
 
-        if (rsvp.guests && rsvp.guests.length > 0) {
-            rsvp.guests.forEach((guest, index) => {
-                const nome = (guest.nome || '').replace(/"/g, '""');
-                const cognome = (guest.cognome || '').replace(/"/g, '""');
-                const allergie = (guest.allergie || 'Nessuna').replace(/"/g, '""');
-                
-                // Prima riga con tutti i dati, altre righe solo per ospiti aggiuntivi
-                if (index === 0) {
-                    csv += `"${date}","${rsvp.contactEmail}","${presence}","${numGuests}","${nome}","${cognome}","${allergie}","${message}"\n`;
-                } else {
-                    csv += `"","","","","${nome}","${cognome}","${allergie}",""\n`;
-                }
-            });
-        } else {
-            csv += `"${date}","${rsvp.contactEmail}","${presence}","0","","","","${message}"\n`;
-        }
+        csv += `"${date}","${row.contactEmail}","${presence}","${nome}","${cognome}","${allergie}","${message}"\n`;
     });
 
     // Scarica file
@@ -145,9 +197,5 @@ function exportToCSV() {
 }
 
 function clearAllData() {
-    if (confirm('Sei sicuro di voler cancellare TUTTI i dati delle conferme? Questa azione non può essere annullata.')) {
-        localStorage.removeItem('weddingRSVPs');
-        loadRSVPs();
-        alert('Tutti i dati sono stati cancellati.');
-    }
+    alert('Per cancellare tutti i dati devi aprire il foglio Google e rimuovere le righe manualmente.');
 }
