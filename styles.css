@@ -68,6 +68,19 @@ body {
     margin-bottom: 30px;
 }
 
+.wedding-subtitle {
+    font-family: var(--font-serif);
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    margin-bottom: 15px;
+    animation: fadeIn 1s ease-out 1s forwards;
+}
+
 .name {
     font-family: var(--font-serif);
     font-size: clamp(3rem, 8vw, 6rem);
@@ -111,10 +124,8 @@ body {
 }
 
 .scroll-indicator {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
+    margin: 40px auto 0;
+    width: 30px;
     opacity: 0;
     animation: fadeIn 1s ease-out 2s forwards;
 }
@@ -718,181 +729,3 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Audio Player */
-.audio-player {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 50px;
-    padding: 12px 20px;
-    box-shadow: 0 8px 30px rgba(44, 95, 141, 0.2);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 2px solid rgba(232, 240, 247, 0.5);
-}
-
-.audio-player:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(44, 95, 141, 0.3);
-}
-
-.audio-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.audio-btn {
-    background: linear-gradient(135deg, var(--gold) 0%, var(--secondary-color) 100%);
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    color: var(--white);
-    font-size: 16px;
-}
-
-.audio-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(44, 95, 141, 0.4);
-}
-
-.audio-btn:active {
-    transform: scale(0.95);
-}
-
-.audio-icon {
-    display: block;
-}
-
-.audio-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.audio-label {
-    font-size: 0.85rem;
-    color: var(--text-dark);
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.volume-control {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.volume-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-}
-
-.volume-btn:hover {
-    transform: scale(1.2);
-}
-
-.volume-icon {
-    display: block;
-}
-
-.volume-slider {
-    width: 80px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--accent-color);
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--secondary-color);
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.volume-slider::-webkit-slider-thumb:hover {
-    background: var(--primary-color);
-}
-
-.volume-slider::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--secondary-color);
-    cursor: pointer;
-    border: none;
-    transition: background 0.2s ease;
-}
-
-.volume-slider::-moz-range-thumb:hover {
-    background: var(--primary-color);
-}
-
-/* Responsive Audio Player */
-@media (max-width: 768px) {
-    .audio-player {
-        bottom: 20px;
-        right: 20px;
-        padding: 10px 15px;
-        gap: 10px;
-    }
-
-    .audio-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 14px;
-    }
-
-    .audio-label {
-        font-size: 0.75rem;
-    }
-
-    .volume-slider {
-        width: 60px;
-    }
-}
-
-@media (max-width: 480px) {
-    .audio-player {
-        bottom: 15px;
-        right: 15px;
-        padding: 8px 12px;
-        flex-wrap: wrap;
-        max-width: calc(100% - 30px);
-    }
-
-    .audio-info {
-        order: 3;
-        width: 100%;
-        text-align: center;
-        margin-top: 5px;
-    }
-
-    .volume-control {
-        margin-left: auto;
-    }
-}

@@ -15,6 +15,7 @@
     <section class="hero" id="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
+            <p class="wedding-subtitle">Matrimonio</p>
             <div class="names-container">
                 <h1 class="name name-1">Anna</h1>
                 <div class="ampersand">&</div>
@@ -47,7 +48,7 @@
                         Con grande gioia e affetto, desideriamo condividere con voi<br>
                         il giorno più importante della nostra vita.
                     </p>
-                    <p class="couple-names">Benigno Anna & Massimo Ferrari</p>
+                    <p class="couple-names">Benigno Anna & Ferrari Massimo</p>
                     <p class="invitation-text">
                         Vi aspettiamo per celebrare insieme<br>
                         il nostro matrimonio
@@ -70,12 +71,18 @@
                 <div class="detail-card">
                     <div class="detail-icon">⏰</div>
                     <h3>Orario</h3>
-                    <p>Da confermare</p>
+                    <p>Ore 11:30 - presenti al locale per l'inizio del rito cerimoniale</p>
                 </div>
                 <div class="detail-card">
                     <div class="detail-icon">📍</div>
                     <h3>Luogo</h3>
-                    <p>Da confermare</p>
+                    <p>
+                        <a href="https://www.google.com/maps?q=Ristorante+Laghetto+della+Gelata,+Via+Valsesia,+1,+28010+Soriso+NO,+Italia"
+                           target="_blank" rel="noopener noreferrer"
+                           style="color: inherit; text-decoration: underline;">
+                            Ristorante Laghetto della Gelata, Via Valsesia, 1, 28010 Soriso NO, Italia
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -150,13 +157,6 @@
         </div>
     </section>
 
-    <!-- Link per visualizzare i risultati (nascosto, accessibile tramite URL) -->
-    <div style="text-align: center; padding: 20px; background: #ffffff;">
-        <a href="admin.html" class="admin-link" style="color: #2c5f8d; text-decoration: none; font-size: 0.9rem; opacity: 0.7;">
-            Visualizza Conferme (Admin)
-        </a>
-    </div>
-
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -164,31 +164,6 @@
             <p class="footer-date">26 Agosto 2026</p>
         </div>
     </footer>
-
-    <!-- Audio Player -->
-    <div class="audio-player" id="audioPlayer">
-        <audio id="backgroundMusic" loop autoplay preload="auto">
-            <source src="harp-music.mp3" type="audio/mpeg">
-            <source src="harp-music.ogg" type="audio/ogg">
-            Il tuo browser non supporta l'elemento audio.
-        </audio>
-        <div class="audio-controls">
-            <button class="audio-btn" id="playPauseBtn" aria-label="Play/Pause">
-                <span class="audio-icon" id="playIcon">▶</span>
-                <span class="audio-icon" id="pauseIcon" style="display: none;">⏸</span>
-            </button>
-            <div class="audio-info">
-                <span class="audio-label">Musica di sottofondo</span>
-            </div>
-            <div class="volume-control">
-                <button class="volume-btn" id="muteBtn" aria-label="Mute/Unmute">
-                    <span class="volume-icon" id="volumeIcon">🔊</span>
-                    <span class="volume-icon" id="muteIcon" style="display: none;">🔇</span>
-                </button>
-                <input type="range" id="volumeSlider" min="0" max="100" value="50" class="volume-slider" aria-label="Volume">
-            </div>
-        </div>
-    </div>
 
     <script src="script.js"></script>
 </body>
