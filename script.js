@@ -171,19 +171,10 @@ function saveRSVP() {
         }
     }
 
-    // Invia i dati al backend Google Apps Script
+    // Invia i dati al backend Google Apps Script (senza header JSON per evitare problemi di CORS)
     fetch(RSVP_API_URL, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
         body: JSON.stringify(rsvpData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Errore durante l\'invio della conferma');
-        }
-        return response.json().catch(() => ({}));
     })
     .then(() => {
         // Mostra messaggio di successo
