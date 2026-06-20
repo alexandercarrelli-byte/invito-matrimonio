@@ -1,8 +1,8 @@
 // Endpoint Google Apps Script (stesso usato nel form)
 const RSVP_API_URL = 'https://script.google.com/macros/s/AKfycbwOvRfUz7Y6rbGJWM-BRjwa8TAdzVr2WxPB6SsROirpv-lsUcTjs4LdZTz6jzdU-2rPuA/exec';
 
-// Cache dati grezzi per export
-let rawRowsForExport = [];
+// Cache RSVP normalizzati per export
+let rsvpsForExport = [];
 
 // Carica e visualizza tutte le conferme
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,10 +28,13 @@ function loadRSVPs() {
             return response.json();
         })
         .then(rows => {
-            // rows è una lista piatta di righe (una per ospite)
-            rawRowsForExport = rows || [];
+            // Le righe possono arrivare in formato piatto (una per ospite, con
+            // guest_nome/guest_cognome/guest_allergie) oppure annidato (una per
+            // conferma, con un array guests[]): le normalizziamo in entrambi i casi.
+            const rsvps = groupRowsByRSVP(rows || []);
+            rsvpsForExport = rsvps;
 
-            if (!rawRowsForExport.length) {
+            if (!rsvps.length) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📋</div>
@@ -42,8 +45,6 @@ function loadRSVPs() {
                 updateStats([]);
                 return;
             }
-
-            const rsvps = groupRowsByRSVP(rawRowsForExport);
 
             // Calcola statistiche
             updateStats(rsvps);
@@ -65,7 +66,9 @@ function loadRSVPs() {
         });
 }
 
-// Raggruppa le righe piatte in oggetti RSVP con lista ospiti
+// Raggruppa le righe in oggetti RSVP con lista ospiti.
+// Gestisce sia il formato piatto (una riga per ospite con guest_nome/...)
+// sia quello annidato (una riga per conferma con un array guests[]).
 function groupRowsByRSVP(rows) {
     const map = new Map();
 
@@ -83,16 +86,38 @@ function groupRowsByRSVP(rows) {
 
         const current = map.get(key);
 
+        // Formato annidato: array di ospiti sulla stessa riga
+        if (Array.isArray(row.guests)) {
+            row.guests.forEach(guest => addGuest(current, guest));
+        }
+
+        // Formato piatto: campi guest_* sulla riga (una riga per ospite)
         if (row.guest_nome || row.guest_cognome || row.guest_allergie) {
-            current.guests.push({
-                nome: row.guest_nome || '',
-                cognome: row.guest_cognome || '',
-                allergie: row.guest_allergie || 'Nessuna'
+            addGuest(current, {
+                nome: row.guest_nome,
+                cognome: row.guest_cognome,
+                allergie: row.guest_allergie
             });
         }
     });
 
     return Array.from(map.values());
+}
+
+// Aggiunge un ospite all'RSVP normalizzando i campi
+function addGuest(rsvp, guest) {
+    if (!guest) return;
+    const nome = (guest.nome || '').trim();
+    const cognome = (guest.cognome || '').trim();
+    const allergie = (guest.allergie || '').trim();
+
+    if (!nome && !cognome && !allergie) return;
+
+    rsvp.guests.push({
+        nome,
+        cognome,
+        allergie: allergie || 'Nessuna'
+    });
 }
 
 function createRSVPItem(rsvp) {
@@ -165,7 +190,7 @@ function updateStats(rsvps) {
 }
 
 function exportToCSV() {
-    if (!rawRowsForExport.length) {
+    if (!rsvpsForExport.length) {
         alert('Nessun dato da esportare');
         return;
     }
@@ -173,15 +198,24 @@ function exportToCSV() {
     // Crea header CSV
     let csv = 'Data,Email,Presenza,Nome,Cognome,Allergie,Messaggio\n';
 
-    rawRowsForExport.forEach(row => {
-        const date = new Date(row.timestamp).toLocaleString('it-IT');
-        const presence = row.presence === 'yes' ? 'Sì' : 'No';
-        const nome = (row.guest_nome || '').replace(/"/g, '""');
-        const cognome = (row.guest_cognome || '').replace(/"/g, '""');
-        const allergie = (row.guest_allergie || 'Nessuna').replace(/"/g, '""');
-        const message = (row.message || '').replace(/"/g, '""');
+    rsvpsForExport.forEach(rsvp => {
+        const date = new Date(rsvp.timestamp).toLocaleString('it-IT');
+        const presence = rsvp.presence === 'yes' ? 'Sì' : 'No';
+        const message = (rsvp.message || '').replace(/"/g, '""');
+        const email = (rsvp.contactEmail || '').replace(/"/g, '""');
 
-        csv += `"${date}","${row.contactEmail}","${presence}","${nome}","${cognome}","${allergie}","${message}"\n`;
+        if (rsvp.guests && rsvp.guests.length) {
+            // Una riga per ogni ospite
+            rsvp.guests.forEach(guest => {
+                const nome = (guest.nome || '').replace(/"/g, '""');
+                const cognome = (guest.cognome || '').replace(/"/g, '""');
+                const allergie = (guest.allergie || 'Nessuna').replace(/"/g, '""');
+                csv += `"${date}","${email}","${presence}","${nome}","${cognome}","${allergie}","${message}"\n`;
+            });
+        } else {
+            // Conferma senza ospiti (es. risposta "No")
+            csv += `"${date}","${email}","${presence}","","","","${message}"\n`;
+        }
     });
 
     // Scarica file
